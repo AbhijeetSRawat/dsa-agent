@@ -1,10 +1,10 @@
-import express from 'express';
-import cors from 'cors';
-import * as dotenv from 'dotenv';
+import express from "express";
+import cors from "cors";
+import * as dotenv from "dotenv";
 dotenv.config();
 
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { Pinecone } from '@pinecone-database/pinecone';
+import { Pinecone } from "@pinecone-database/pinecone";
 import { GoogleGenAI } from "@google/genai";
 
 const app = express();
@@ -15,10 +15,13 @@ const ai = new GoogleGenAI({});
 const sessions = new Map();
 
 async function transformQuery(question, history) {
-  const tempHistory = [...history, {
-    role: 'user',
-    parts: [{ text: question }]
-  }];
+  const tempHistory = [
+    ...history,
+    {
+      role: "user",
+      parts: [{ text: question }],
+    },
+  ];
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
@@ -32,7 +35,7 @@ Only output the rewritten question and nothing else.`,
   return response.text;
 }
 
-app.post('/api/chat', async (req, res) => {
+app.post("/api/chat", async (req, res) => {
   try {
     const { question, sessionId } = req.body;
 
@@ -59,12 +62,12 @@ app.post('/api/chat', async (req, res) => {
     });
 
     const context = searchResults.matches
-      .map(match => match.metadata.text)
+      .map((match) => match.metadata.text)
       .join("\n\n---\n\n");
 
     history.push({
-      role: 'user',
-      parts: [{ text: question }]
+      role: "user",
+      parts: [{ text: question }],
     });
 
     const response = await ai.models.generateContent({
@@ -83,14 +86,14 @@ Context: ${context}`,
     });
 
     history.push({
-      role: 'model',
-      parts: [{ text: response.text }]
+      role: "model",
+      parts: [{ text: response.text }],
     });
 
     res.json({ answer: response.text });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Something went wrong!' });
+    res.status(500).json({ error: "Something went wrong!" });
   }
 });
 
