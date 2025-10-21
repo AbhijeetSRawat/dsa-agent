@@ -28,7 +28,7 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:3001/api/chat', {
+      const res = await axios.post('https://dsa-agent.onrender.com/api/chat', {
         question: input,
         sessionId
       });
